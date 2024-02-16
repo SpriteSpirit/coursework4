@@ -37,7 +37,7 @@ class Vacancy:
 
     @staticmethod
     def cast_to_object_list(vacancies: dict) -> list:
-        """ Преобразует словарь с вакансиями в список объектов Vacancy, учитывая указанную зарплату """
+        """ Преобразует словарь с вакансиями в список объектов Vacancy """
 
         vacancies_list = []
 
@@ -61,7 +61,7 @@ class Vacancy:
 
     @staticmethod
     def cast_to_object_list_by_salary(vacancies: dict, salary: int = 0) -> list:
-        """ Сортирует список вакансий и возвращает отсортированный список """
+        """ Сортирует список вакансий и возвращает отсортированный список по зарплате """
         vacancies_list = []
 
         for vacancy in vacancies['items']:
