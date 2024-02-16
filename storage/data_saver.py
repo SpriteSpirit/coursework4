@@ -10,4 +10,3 @@ class DataSaver(ABC):
     @abstractmethod
     def delete_vacancy(self, index, filename):
         pass
-

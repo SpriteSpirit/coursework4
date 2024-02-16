@@ -60,16 +60,25 @@ class Vacancy:
         return vacancies_list
 
     @staticmethod
-    def cast_to_object_list_by_salary(vacancies: dict, salary: int):
-        all_vacancies = Vacancy.cast_to_object_list(vacancies)
+    def cast_to_object_list_by_salary(vacancies: dict, salary: int = 0) -> list:
+        """ Сортирует список вакансий и возвращает отсортированный список """
         vacancies_list = []
 
-        for vacancy in all_vacancies:
-            salary_from = vacancy.cast_to_json_format().get('salary')[0]
+        for vacancy in vacancies['items']:
+            salary_from = vacancy.get('salary').get('from')
 
-            if salary_from is not None and isinstance(salary_from, int):
+            if salary_from is not None:
                 if salary <= salary_from:
-                    vacancies_list.append(vacancy)
+                    vacancies_list.append(Vacancy(
+                        vacancy['area']['name'],
+                        vacancy['name'],
+                        vacancy['alternate_url'],
+                        salary,
+                        vacancy['snippet']['requirement'] if vacancy['snippet']['requirement'] is not None
+                        else vacancy['snippet']['responsibility'],
+                        vacancy['experience']['name'],
+                        vacancy['schedule']['name'],
+                    ))
 
         return vacancies_list
 
@@ -79,7 +88,7 @@ class Vacancy:
         """ Сортирует список вакансий и возвращает отсортированный список """
 
         if is_slice:
-            sorted_list = sorted(list_vacancies, reverse=not is_reverse)[-slice_num:]
+            sorted_list = sorted(list_vacancies, reverse=is_reverse)[-slice_num:]
         else:
             sorted_list = sorted(list_vacancies, reverse=is_reverse)
 
@@ -87,11 +96,6 @@ class Vacancy:
 
     @staticmethod
     def get_founded_vacancies(list_vacancies: list) -> str:
-        """  """
+        """ Возвращает строку с указанием количества найденных вакансий """
 
         return f'\nНайдено вакансий по запросу: {len(list_vacancies)}\n'
-
-# test_list = [1, 5, 90, 3, 76, 23, 45, 64, 36, 12]
-#
-# print(Vacancy.get_sorted_vacancies(test_list))
-# print(Vacancy.get_sorted_vacancies(test_list, True, True, 2))

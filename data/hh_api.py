@@ -3,9 +3,6 @@ import requests
 
 
 class HeadHunterAPI(JobAPI):
-    """
-
-    """
     def get_vacancies(self, city: str, search_query: str, page=0) -> dict:
         """
         Получает список вакансий для указанного города и поискового запроса.
@@ -19,7 +16,7 @@ class HeadHunterAPI(JobAPI):
 
         params = {
             'text': f'NAME:{search_query}',
-            'area': self.get_city_id_by_name(city),
+            'area': city,
             'only_with_salary': True,
             'page': page,
             'per_page': 100,
@@ -33,11 +30,13 @@ class HeadHunterAPI(JobAPI):
     @staticmethod
     def get_areas() -> dict:
         """ Возвращает словарь стран """
+
         return requests.get('https://api.hh.ru/areas').json()
 
     @staticmethod
     def get_cities() -> dict:
         """ Возвращает словарь с информацией о городах. """
+
         cities = {}
 
         for country in HeadHunterAPI.get_areas():
@@ -56,6 +55,7 @@ class HeadHunterAPI(JobAPI):
         :param city_name: Название города.
         :return: Числовой идентификатор города.
         """
+
         cities = HeadHunterAPI.get_cities()
 
         for city in cities.keys():
@@ -69,12 +69,9 @@ class HeadHunterAPI(JobAPI):
         :param city_id: Числовой идентификатор города.
         :return: Название города.
         """
+
         cities = HeadHunterAPI.get_cities()
 
         for city_name in cities.keys():
             if city_id == cities[city_name]:
                 return city_name
-
-
-# print(HeadHunterAPI.get_city_name_by_id(54))
-# print(HeadHunterAPI.get_city_id_by_name("москва"))

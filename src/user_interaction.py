@@ -44,7 +44,7 @@ def get_vacancies_by_query(city: str, query: str) -> list:
 def get_sorted_vacancies(vacancies: list, is_ascending_order: bool = True) -> list:
     """ Сортирует вакансии по возрастанию зарплаты """
 
-    return sorted(vacancies, reverse=is_ascending_order)
+    return sorted(vacancies, reverse=not is_ascending_order)
 
 
 def info_template(counter: int, vacancy) -> None:
@@ -55,16 +55,20 @@ def info_template(counter: int, vacancy) -> None:
     print('-' * 50)
     print(f'Город: {vacancy.city}')
     print(f'Название: {vacancy.title}')
-    print(f'Зарплата от {vacancy.salary[0]} до {vacancy.salary[1]} [RUB]')
+    if isinstance(vacancy.salary, list):
+        print(f'Зарплата от {vacancy.salary[0]} до {vacancy.salary[1]} [RUB]')
+    else:
+        print(f'Зарплата от {vacancy.salary} [RUB]')
     print(f'Требования: {vacancy.description}', flush=True)
     print(f'Опыт работы: {vacancy.experience}')
-    print(f'Ссылка на вакансию: {vacancy.url}')
+    print(f'Ссылка на вакансию: {vacancy.url}\n')
 
 
 def display_vacancies(vacancies: list, is_ask_to_save: bool = False) -> None:
     """ Вывод вакансий полностью и поштучно """
 
     print(Vacancy.get_founded_vacancies(vacancies))
+    input(':: нажмите ENTER, чтобы продолжить ::')
 
     if not is_ask_to_save:
         for i, vacancy in enumerate(vacancies):
@@ -76,15 +80,140 @@ def display_vacancies(vacancies: list, is_ask_to_save: bool = False) -> None:
             if ask_to_save_vacancy():
                 add_vacancy_to_list(vacancy)
 
-    print('Показаны все вакансии')
-    print(':: нажмите ENTER, чтобы продолжить ::')
+    print(f'Показаны все {len(vacancies)} вакансии\n')
+
+
+def ask_to_view_all() -> bool:
+    """ Спрашивает у пользователя как показать вакансии: поштучно или все """
+
+    while True:
+        print('Как хотите посмотреть вакансии?')
+        print('[1 : посмотреть все вакансии]')
+        print('[2 : посмотреть вакансии поштучно]')
+        print('[0 : вернуться в меню]')
+
+        user_choice = input('::=> ')
+
+        try:
+            user_choice = int(user_choice)
+
+            if user_choice == 1:
+                return True
+            elif user_choice == 2:
+                return False
+            elif user_choice == 0:
+                break
+        except ValueError:
+            print('Неверный ввод. Попробуйте снова.')
+
+
+# !---------------------------------------------!
+def search_vacancies() -> None:
+    # формирует список вакансий в зависимости от того, что выбрал пользователь (с зп - False или без - True)
+    # пользователь выбрал фильтр с зп
+    create_filter = ask_to_create_filter()
+
+    if not create_filter and create_filter is not None:
+        # получаем вакансии с фильтром по зарплате
+        result = get_vacancies_by_user_query_with_salary()
+        # пользователь хочет посмотреть все вакансии
+        if ask_to_view_all():
+            # пользователь хочет отсортировать вакансии по возрастанию зп
+            if ask_to_sort_vacancies():
+                sort_vacancies = get_sorted_vacancies(result)
+                display_vacancies(sort_vacancies)
+                # пользователь хочет сохранить список вакансий
+                if ask_to_save_vacancies():
+                    save_all_vacancies(sort_vacancies, 'favourite_vacancies')
+            # пользователь не хочет сортировать вакансии по возрастанию зп
+            else:
+                display_vacancies(result, True)
+                if ask_to_save_vacancies():
+                    save_all_vacancies(result, 'favourite_vacancies', True)
+        # пользователь хочет посмотреть вакансии с зп поштучно
+        else:
+            # пользователь хочет отсортировать вакансии по возрастанию зп
+            if ask_to_sort_vacancies():
+                sorted_vacancies = get_sorted_vacancies(result)
+                display_vacancies(sorted_vacancies, True)
+                if ask_to_save_vacancies():
+                    save_all_vacancies(sorted_vacancies, 'favourite_vacancies', True)
+            else:
+                display_vacancies(result, True)
+                if ask_to_save_vacancies():
+                    save_all_vacancies(result, 'favourite_vacancies', True)
+    # пользователь выбрал фильтр с без зп
+    elif create_filter:
+        query_vacancies = get_vacancies_by_user_query()
+        display_vacancies(query_vacancies)
+        should_save = ask_to_save_vacancies()
+
+        if should_save:
+            save_all_vacancies(query_vacancies, 'favourite_vacancies')
+    elif create_filter is None:
+        return
+
+
+def search_top_vacancies():
+    top_vacancies = get_slice_top_vacancies()
+    display_vacancies(top_vacancies)
+    if ask_to_save_vacancies():
+        save_all_vacancies(top_vacancies, 'top_vacancies')
+
+
+def ask_to_create_filter() -> bool:
+    """ Запрашивает у пользователя вариант просмотра вакансии """
+
+    while True:
+        print('Как будем искать вакансии?')
+        print('[1 : посмотреть все вакансии по запросу]')
+        print('[2 : посмотреть вакансии с фильтром по зарплате]')
+        print('[0 : вернуться в меню]')
+
+        user_choice = input('::=> ')
+
+        try:
+            user_choice = int(user_choice)
+
+            if user_choice == 1:
+                return True
+            elif user_choice == 2:
+                return False
+            elif user_choice == 0:
+                break
+        except ValueError:
+            print('Неверный ввод. Попробуйте снова.')
 
 
 def ask_to_save_vacancy() -> bool:
-    """ Запрашивает у пользователя сохранение одно вакансии """
+    """ Запрашивает у пользователя сохранение одной вакансии """
 
     while True:
         print('Сохранить вакансию в избранное?')
+        print('[1 : да]')
+        print('[2 : нет]')
+        print('[0 : завершить]')
+
+        user_choice = input('::=> ')
+
+        try:
+            user_choice = int(user_choice)
+
+            if user_choice == 1:
+                return True
+            elif user_choice == 2:
+                return False
+            elif user_choice == 0:
+                break
+        except ValueError:
+            print('Неверный ввод. Попробуйте снова.')
+
+
+def ask_to_save_vacancies() -> bool:
+    """ Запрашивает у пользователя сохранение всех добавленных вакансии """
+
+    while True:
+        print('Сохранить список вакансий?')
         print('[1 : да]')
         print('[2 : нет]')
         print('[0 : завершить]')
@@ -142,7 +271,7 @@ def save_all_vacancies(vacancies_list: list, filename: str, has_one_before: bool
             for vacancy in vacancies_list:
                 add_vacancy_to_list(vacancy)
 
-        JSONSaver.save_json(vacancies_list, filename)
+        JSONSaver.save_json(user_list, filename)
     else:
         print('Список вакансий пуст. Нет данных для сохранения\n')
 
@@ -158,7 +287,7 @@ def get_top_vacancies_by_salary() -> list:
 
 
 def ask_to_slice_top_vacancies() -> bool:
-    """ Спрашивает у пользователя желает ли тот выполнить срез Топ-вакансий для просмотра """
+    """ Спрашивает у пользователя желает ли тот выполнить срез ТОП вакансий для просмотра """
 
     while True:
         print('Желаете указать количество ТОП вакансий для просмотра?')
@@ -182,11 +311,15 @@ def ask_to_slice_top_vacancies() -> bool:
 
 
 def get_slice_top_vacancies() -> list:
-    """ Возвращает срез топ-вакансий """
+    """ Возвращает срез ТОП вакансий """
 
     top_vacancies = get_top_vacancies_by_salary()
 
-    if ask_to_slice_top_vacancies():
+    print(Vacancy.get_founded_vacancies(top_vacancies))
+
+    result = ask_to_slice_top_vacancies()
+
+    if result and result is not None:
         while True:
             print("Введите количество вакансий для просмотра:")
             number = input('::=> ')
@@ -195,11 +328,15 @@ def get_slice_top_vacancies() -> list:
                 number = int(number)
 
                 if number > len(top_vacancies):
-                    return top_vacancies[-len(top_vacancies):]
+                    return Vacancy.get_sorted_vacancies(top_vacancies, is_slice=True, slice_num=len(top_vacancies))
                 else:
-                    return top_vacancies[-number:]
+                    return Vacancy.get_sorted_vacancies(top_vacancies, is_slice=True, slice_num=number)
             except ValueError:
                 print('Неверный ввод. Попробуйте снова.')
+    elif not result:
+        return top_vacancies
+    else:
+        return
 
 
 def load_and_view_saved_vacancies(filename: str) -> None:
@@ -259,7 +396,7 @@ def ask_to_edit_saved_vacancies_list() -> None:
             print('Неверный ввод. Попробуйте снова.')
 
 
-def edit_saved_vacancy(filename: str):
+def edit_saved_vacancy(filename: str) -> None:
     """ Удаляет указанную пользователем вакансию """
 
     load_and_view_saved_vacancies(filename)
@@ -275,6 +412,7 @@ def edit_saved_vacancy(filename: str):
 
             if user_choice != 0:
                 JSONSaver.delete_vacancy(user_data, user_choice, filename)
+                break
             else:
                 break
         except ValueError:
