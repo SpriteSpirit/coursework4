@@ -8,6 +8,6 @@ class DataSaver(ABC):
         pass
 
     @abstractmethod
-    def delete_vacancy(self, *args):
+    def delete_vacancy(self, index, filename):
         pass
 

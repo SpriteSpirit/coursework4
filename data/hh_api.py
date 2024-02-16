@@ -16,9 +16,10 @@ class HeadHunterAPI(JobAPI):
 
         :return: Словарь с данными о вакансиях.
         """
+
         params = {
             'text': f'NAME:{search_query}',
-            'area': city,
+            'area': self.get_city_id_by_name(city),
             'only_with_salary': True,
             'page': page,
             'per_page': 100,
