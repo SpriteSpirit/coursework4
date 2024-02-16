@@ -32,7 +32,7 @@ def get_vacancies_by_user_query() -> list:
 
 
 def get_vacancies_by_query(city: str, query: str) -> list:
-    """ Возвращает список вакансий hh по запроса и городу, без зарплаты """
+    """ Возвращает список вакансий hh по запросу и городу, без зарплаты """
 
     hh_api = HeadHunterAPI()
     city_id = HeadHunterAPI.get_city_id_by_name(city_name=city)
@@ -128,13 +128,13 @@ def ask_to_sort_vacancies() -> bool:
             print('Неверный ввод. Попробуйте снова.')
 
 
-def add_vacancy_to_list(vacancy):
+def add_vacancy_to_list(vacancy) -> None:
     """ Добавляет указанную вакансию в список вакансий для сохранения """
 
     user_data.add_vacancy(vacancy)
 
 
-def save_all_vacancies(vacancies_list: list, filename: str, has_one_before: bool = False):
+def save_all_vacancies(vacancies_list: list, filename: str, has_one_before: bool = False) -> None:
     """ Сохраняет все выбранные вакансии в указанный файл """
 
     if vacancies_list is not None and len(vacancies_list) != 0:
@@ -200,3 +200,82 @@ def get_slice_top_vacancies() -> list:
                     return top_vacancies[-number:]
             except ValueError:
                 print('Неверный ввод. Попробуйте снова.')
+
+
+def load_and_view_saved_vacancies(filename: str) -> None:
+    """ Загружает и выводит список сохраненных вакансий """
+
+    saved_data = JSONSaver.load_json(filename)
+    display_vacancies([Vacancy(**data) for data in saved_data['items']])
+
+
+# просмотр сохраненных вакансий
+def ask_to_view_saved_vacancies_list() -> None:
+    """ Спрашивает у пользователя какой список он желает посмотреть """
+
+    while True:
+        print('Выберите действие:')
+        print('[1 : просмотр избранных вакансий]')
+        print('[2 : просмотр ТОП вакансий]')
+        print('[0 : завершить]')
+
+        user_choice = input('::=> ')
+
+        try:
+            user_choice = int(user_choice)
+
+            if user_choice == 1:
+                load_and_view_saved_vacancies('favourite_vacancies')
+            elif user_choice == 2:
+                load_and_view_saved_vacancies('top_vacancies')
+            elif user_choice == 0:
+                break
+        except ValueError:
+            print('Неверный ввод. Попробуйте снова.')
+
+
+# редактирование вакансий
+def ask_to_edit_saved_vacancies_list() -> None:
+    """ Спрашивает у пользователя какой список тот желает отредактировать """
+
+    while True:
+        print('Выберите действие:')
+        print('[1 : редактировать список избранных вакансий]')
+        print('[2 : редактировать список ТОП вакансий]')
+        print('[0 : выйти в главное меню]')
+
+        user_choice = input('::=> ')
+
+        try:
+            user_choice = int(user_choice)
+
+            if user_choice == 1:
+                edit_saved_vacancy('favourite_vacancies')
+            elif user_choice == 2:
+                edit_saved_vacancy('top_vacancies')
+            elif user_choice == 0:
+                break
+        except ValueError:
+            print('Неверный ввод. Попробуйте снова.')
+
+
+def edit_saved_vacancy(filename: str):
+    """ Удаляет указанную пользователем вакансию """
+
+    load_and_view_saved_vacancies(filename)
+
+    while True:
+        print('Введите номер вакансии для удаления:')
+        print('[0 : выйти в главное меню]')
+
+        user_choice = input('::=> ')
+
+        try:
+            user_choice = int(user_choice)
+
+            if user_choice != 0:
+                JSONSaver.delete_vacancy(user_data, user_choice, filename)
+            else:
+                break
+        except ValueError:
+            print('Неверный ввод. Попробуйте снова.')
