@@ -15,7 +15,7 @@ class Vacancy:
     def __lt__(self, other):
         return self.salary < other.salary
 
-    def to_json_format(self) -> dict:
+    def cast_to_json_format(self) -> dict:
         """ Преобразует объект вакансии в формат JSON """
 
         return {
@@ -29,8 +29,55 @@ class Vacancy:
         }
 
     @staticmethod
-    def to_parent_dict(list_vacancies: list) -> dict:
+    def cast_to_parent_dict(list_vacancies: list) -> dict:
         """ Преобразует список вакансий в словарь с ключом 'items'
         - list_vacancies (list): Список объектов вакансий """
 
         return {'items': list_vacancies}
+
+    @staticmethod
+    def cast_to_object_list(vacancies: dict, salary: int) -> list:
+        """ Преобразует словарь с вакансиями в список объектов Vacancy, учитывая указанную зарплату """
+
+        vacancies_list = []
+
+        for vacancy in vacancies['items']:
+            salary_from = vacancy.get('salary').get('from')
+
+            if salary_from is not None:
+                if salary <= salary_from:
+                    vacancies_list.append(Vacancy(
+                        vacancy['area']['name'],
+                        vacancy['name'],
+                        vacancy['alternate_url'],
+                        salary_from,
+                        vacancy['snippet']['requirement'] if vacancy['snippet']['requirement'] is not None
+                        else vacancy['snippet']['responsibility'],
+                        vacancy['experience']['name'],
+                        vacancy['schedule']['name'],
+                    ))
+        return vacancies_list
+
+    @staticmethod
+    def get_sorted_vacancies(list_vacancies: list, is_reverse: bool = False, is_slice=False,
+                             slice_num: int = 0) -> list:
+        """ Сортирует список вакансий и возвращает отсортированный список """
+
+        if is_slice:
+            sorted_list = sorted(list_vacancies, reverse=not is_reverse)[-slice_num:]
+        else:
+            sorted_list = sorted(list_vacancies, reverse=is_reverse)
+
+        return sorted_list
+
+    @staticmethod
+    def get_founded_vacancies(list_vacancies: list) -> str:
+        """  """
+
+        return f'\nНайдено вакансий по запросу: {len(list_vacancies)}\n'
+
+
+# test_list = [1, 5, 90, 3, 76, 23, 45, 64, 36, 12]
+#
+# print(Vacancy.get_sorted_vacancies(test_list))
+# print(Vacancy.get_sorted_vacancies(test_list, True, True, 2))
