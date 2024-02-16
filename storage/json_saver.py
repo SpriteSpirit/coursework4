@@ -3,6 +3,7 @@ import os
 
 from src.vacancy import Vacancy
 from storage.data_saver import DataSaver
+from user_interaction import info_template
 
 
 class JSONSaver(DataSaver):
@@ -11,12 +12,12 @@ class JSONSaver(DataSaver):
         self.user_list = []
 
     def add_vacancy(self, vacancy):
-        """  """
+        """ Добавляет вакансию в список пользователя """
         self.user_list.append(vacancy.cast_to_json_format())
         return self.user_list
 
     def delete_vacancy(self, index: int, filename: str):
-        """  """
+        """ Удаляет вакансию из списка пользователя """
         data = self.load_json(filename)
 
         if data['items'] != 0:
@@ -26,7 +27,7 @@ class JSONSaver(DataSaver):
 
     @staticmethod
     def get_full_json_address_by_filename(filename: str) -> str:
-        """  """
+        """ Получает полный адрес к файлу по указанному имени"""
 
         root_folder = os.path.dirname(os.path.abspath(__file__))
         json_name = f'{filename}.json'
@@ -36,7 +37,7 @@ class JSONSaver(DataSaver):
 
     @staticmethod
     def save_json(list_vacancies: list, filename: str):
-        """  """
+        """ Сохраняет список вакансий в json-файл """
         address = JSONSaver.get_full_json_address_by_filename(filename)
 
         if os.path.exists(address):
@@ -45,12 +46,12 @@ class JSONSaver(DataSaver):
 
         vacancies_count = len(list_vacancies["items"]) if isinstance(list_vacancies, dict) else len(list_vacancies)
 
-        print(f'Вакансии в списке: {vacancies_count}')
+        print(f'Вакансий в списке: {vacancies_count}')
         print(f'Список вакансий сохранен в {address}\n')
 
     @staticmethod
     def load_json(filename: str):
-        """  """
+        """ Выгружает из json-файла список вакансий """
         address = JSONSaver.get_full_json_address_by_filename(filename)
 
         with open(address, 'r', encoding='utf-8') as file:
@@ -58,21 +59,19 @@ class JSONSaver(DataSaver):
 
         return data
 
-# # testing data (need to delete)
+# testing data (need to delete)
 # from data.hh_api import HeadHunterAPI
-#
 #
 # hh = HeadHunterAPI()
 # vacancies = hh.get_vacancies('москва', 'java')
 # test_json = JSONSaver()
-# hh_vacancies = Vacancy.cast_to_object_list(vacancies, 350000)
+# hh_vacancies = Vacancy.cast_to_object_list(vacancies)
+# hh_vacancies2 = Vacancy.cast_to_object_list_by_salary(vacancies, 350000)
 #
-# for vacancy in hh_vacancies:
-#     # print(vacancy.cast_to_json_format_format())
-#     test_json.add_vacancy(vacancy)
-#
+# for i, vacancy in enumerate(hh_vacancies2):
+    # print(vacancy.cast_to_json_format_format())
+    # test_json.add_vacancy(vacancy)
+    # info_template(i, vacancy)
 # test_json.save_json(test_json.user_list, 'favourite_vacancies')
-#
+
 # test_json.delete_vacancy(1, 'favourite_vacancies')
-# test_json.delete_vacancy(1, 'favourite_vacancies')
-# test_json.delete_vacancy(2, 'favourite_vacancies')

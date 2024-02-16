@@ -36,26 +36,41 @@ class Vacancy:
         return {'items': list_vacancies}
 
     @staticmethod
-    def cast_to_object_list(vacancies: dict, salary: int) -> list:
+    def cast_to_object_list(vacancies: dict) -> list:
         """ Преобразует словарь с вакансиями в список объектов Vacancy, учитывая указанную зарплату """
 
         vacancies_list = []
 
         for vacancy in vacancies['items']:
             salary_from = vacancy.get('salary').get('from')
+            salary_to = vacancy.get('salary').get('to')
+            salary = [salary_from if salary_from is not None else 'не указана',
+                      salary_to if salary_to is not None else 'не указана']
 
-            if salary_from is not None:
+            vacancies_list.append(Vacancy(
+                vacancy['area']['name'],
+                vacancy['name'],
+                vacancy['alternate_url'],
+                salary,
+                vacancy['snippet']['requirement'] if vacancy['snippet']['requirement'] is not None
+                else vacancy['snippet']['responsibility'],
+                vacancy['experience']['name'],
+                vacancy['schedule']['name'],
+            ))
+        return vacancies_list
+
+    @staticmethod
+    def cast_to_object_list_by_salary(vacancies: dict, salary: int):
+        all_vacancies = Vacancy.cast_to_object_list(vacancies)
+        vacancies_list = []
+
+        for vacancy in all_vacancies:
+            salary_from = vacancy.cast_to_json_format().get('salary')[0]
+
+            if salary_from is not None and isinstance(salary_from, int):
                 if salary <= salary_from:
-                    vacancies_list.append(Vacancy(
-                        vacancy['area']['name'],
-                        vacancy['name'],
-                        vacancy['alternate_url'],
-                        salary_from,
-                        vacancy['snippet']['requirement'] if vacancy['snippet']['requirement'] is not None
-                        else vacancy['snippet']['responsibility'],
-                        vacancy['experience']['name'],
-                        vacancy['schedule']['name'],
-                    ))
+                    vacancies_list.append(vacancy)
+
         return vacancies_list
 
     @staticmethod
@@ -75,7 +90,6 @@ class Vacancy:
         """  """
 
         return f'\nНайдено вакансий по запросу: {len(list_vacancies)}\n'
-
 
 # test_list = [1, 5, 90, 3, 76, 23, 45, 64, 36, 12]
 #

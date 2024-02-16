@@ -2,9 +2,24 @@
   "items": [
     {
       "city": "Москва",
+      "title": "Senior Java Developer (Kotlin)",
+      "url": "https://hh.ru/vacancy/91885382",
+      "salary": [
+        400000,
+        "не указана"
+      ],
+      "description": "Что нужно знать и уметь:). Отличные знания Java 11+. Знания Spring / Spring Boot / Spring Cloud. Теплые отношения с DevOps...",
+      "experience": "От 3 до 6 лет",
+      "schedule": "Удаленная работа"
+    },
+    {
+      "city": "Москва",
       "title": "Team Lead (JAVA)",
       "url": "https://hh.ru/vacancy/92116584",
-      "salary": 350000,
+      "salary": [
+        350000,
+        550000
+      ],
       "description": "Обязателен технический бэкграунд на JAVA. Опыт управления проектами/командами в ИТ. Знание методологий Scrum, Agile и опыт выстраивания работы команды...",
       "experience": "Более 6 лет",
       "schedule": "Полный день"
@@ -13,10 +28,25 @@
       "city": "Москва",
       "title": "Senior Java/Kotlin developer",
       "url": "https://hh.ru/vacancy/92550366",
-      "salary": 360000,
+      "salary": [
+        360000,
+        400000
+      ],
       "description": "Опыт работы с микросервисной архитектурой или хорошее понимание(паттерны, межсервисное взаимодействие, распределенные транзакции). Хорошие навыки system design. Опыт работы с...",
       "experience": "Более 6 лет",
       "schedule": "Удаленная работа"
+    },
+    {
+      "city": "Москва",
+      "title": "Java-разработчик",
+      "url": "https://hh.ru/vacancy/92116874",
+      "salary": [
+        350000,
+        "не указана"
+      ],
+      "description": "Docker/Kubernetes(или OpenShift). Опыт работы со Spring. Опыт проектирования и разработки архитектуры систем - микросервисы, монолиты, ивент-дривн систем. ",
+      "experience": "Более 6 лет",
+      "schedule": "Полный день"
     }
   ]
 }
